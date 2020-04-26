@@ -14,7 +14,6 @@ from configparser import ConfigParser
 from unidecode import unidecode
 from miflora.miflora_poller import MiFloraPoller, MI_BATTERY, MI_CONDUCTIVITY, MI_LIGHT, MI_MOISTURE, MI_TEMPERATURE
 from btlewrap import BluepyBackend, GatttoolBackend, BluetoothBackendException
-from bluepy.btle import BTLEException
 import paho.mqtt.client as mqtt
 import sdnotify
 from signal import signal, SIGPIPE, SIG_DFL
@@ -208,7 +207,7 @@ for [name, mac] in config['Sensors'].items():
         flora_poller.fill_cache()
         flora_poller.parameter_value(MI_LIGHT)
         flora['firmware'] = flora_poller.firmware_version()
-    except (IOError, BluetoothBackendException, BTLEException, RuntimeError, BrokenPipeError) as e:
+    except (IOError, BluetoothBackendException, RuntimeError, BrokenPipeError) as e:
         print_line('Initial connection to Mi Flora sensor "{}" ({}) failed due to exception: {}'.format(name_pretty, mac, e), error=True, sd_notify=True)
     else:
         print('Internal name: "{}"'.format(name_clean))
