@@ -7,6 +7,7 @@ import json
 import os.path
 import argparse
 from time import time, sleep, localtime, strftime
+import logging
 from collections import OrderedDict
 from colorama import init as colorama_init
 from colorama import Fore, Back, Style
@@ -18,6 +19,29 @@ import paho.mqtt.client as mqtt
 import sdnotify
 from signal import signal, SIGPIPE, SIG_DFL
 signal(SIGPIPE,SIG_DFL)
+
+
+FORMATTER_INFO = {
+    'name': '%(name)s',
+    'levelno': '%(levelno)s',
+    'levelname': '%(levelname)s',
+    'pathname': '%(pathname)s',
+    'filename': '%(filename)s',
+    'module': '%(module)s',
+    'funcName': '%(funcName)s',
+    'lineno': '%(lineno)d',
+    'created': '%(created)f',
+    'relativeCreated': '%(relativeCreated)d',
+    'asctime': '%(asctime)s',
+    'thread': '%(thread)d',
+    'threadName': '%(threadName)s',
+    'process': '%(process)d',
+    'message': '%(message)s',
+}
+
+FORMATTER = logging.Formatter(f'{FORMATTER_INFO["asctime"]}: {FORMATTER_INFO["name"]}: {FORMATTER_INFO["levelname"]}: {FORMATTER_INFO["message"]}', datefmt='%Y-%m-%d %H:%M:%S %p')
+
+
 
 project_name = 'Xiaomi Mi Flora Plant Sensor MQTT Client/Daemon'
 project_url = 'https://github.com/ThomDietrich/miflora-mqtt-daemon'
@@ -50,7 +74,7 @@ print(Style.RESET_ALL)
 sd_notifier = sdnotify.SystemdNotifier()
 
 # Logging function
-def print_line(text, error = False, warning=False, sd_notify=False, console=True):
+def print_line(text, error = False, warning=False, sd_notify=False, console=True, logging=True):
     timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime())
     if console:
         if error:
@@ -62,6 +86,15 @@ def print_line(text, error = False, warning=False, sd_notify=False, console=True
     timestamp_sd = strftime('%b %d %H:%M:%S', localtime())
     if sd_notify:
         sd_notifier.notify('STATUS={} - {}.'.format(timestamp_sd, unidecode(text)))
+    if logging:
+        if error:
+            logging.error('[{}] '.format(timestamp) + '{}'.format(text))
+        elif warning:
+            logging.warning('[{}] '.format(timestamp) + '{}'.format(text))
+        else:
+            logging.info('[{}] '.format(timestamp) + '{}'.format(text))
+                              
+
 
 # Identifier cleanup
 def clean_identifier(name):
