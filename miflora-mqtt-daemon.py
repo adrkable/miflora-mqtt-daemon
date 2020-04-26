@@ -193,7 +193,7 @@ for [name, mac] in config['Sensors'].items():
     flora = OrderedDict()
     print('Adding sensor to device list and testing connection ...')
     print('Name:          "{}"'.format(name_pretty))
-    # print_line('Attempting initial connection to Mi Flora sensor "{}" ({})'.format(name_pretty, mac), console=False, sd_notify=True)
+    print_line('Attempting initial connection to Mi Flora sensor "{}" ({})'.format(name_pretty, mac), console=True, sd_notify=True)
 
     flora_poller = MiFloraPoller(mac=mac, backend=BluepyBackend, cache_timeout=miflora_cache_timeout, retries=3, adapter=used_adapter)
     flora['poller'] = flora_poller
@@ -309,7 +309,7 @@ elif reporting_mode == 'wirenboard-mqtt':
     sleep(0.5) # some slack for the publish roundtrip and callback function
     print()
 
-print_line('Initialization complete, starting MQTT publish loop', console=False, sd_notify=True)
+print_line('Initialization complete, starting MQTT publish loop', console=True, sd_notify=True)
 
 
 # Sensor data retrieval and publication
@@ -394,7 +394,7 @@ while True:
             raise NameError('Unexpected reporting_mode.')
         print()
 
-    print_line('Status messages published', console=False, sd_notify=True)
+    print_line('Status messages published', console=True, sd_notify=True)
 
     if daemon_enabled:
         print_line('Sleeping ({} seconds) ...'.format(sleep_period))
